@@ -497,19 +497,16 @@ def serve_results(filename):
 # STARTUP
 # ══════════════════════════════════════════════════════════
 if __name__ == "__main__":
-    port = int(os.environ.get("PORT", 5000))
+    # Railway REQUIRES the app to bind to 0.0.0.0:$PORT
+    port = int(os.environ.get("PORT", 8080))
 
-    print("\n" + "=" * 55)
-    print("  Transformer Performance Modeling - Web UI")
-    print("=" * 55)
-    print(f"  URL     : http://0.0.0.0:{port}")
-    print(f"  Results : {RESULTS_DIR}")
-    print(f"  Framework loaded: {FRAMEWORK_OK}")
-    print("=" * 55 + "\n")
+    print(f"[START] PORT from environment: {os.environ.get('PORT', 'NOT SET')}")
+    print(f"[START] Using port: {port}")
+    print(f"[START] Starting Flask on 0.0.0.0:{port}")
 
     app.run(
-        debug=False,
         host="0.0.0.0",
         port=port,
+        debug=False,
         use_reloader=False,
     )
