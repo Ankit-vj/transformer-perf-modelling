@@ -1,0 +1,56 @@
+# Save as: C:\Users\ankit\transformer-perf-model\configs\hardware\mid_range_soc.yaml
+
+name: "RISC-V Mid-Range SoC"
+num_cores: 4
+
+core:
+  name: "rv64gcv"
+  frequency_ghz: 2.0
+  pipeline:
+    num_stages: 5
+    issue_width: 2
+    retire_width: 2
+    rob_size: 64
+
+vector:
+  vlen: 256
+  elen: 64
+  num_vector_regs: 32
+  enabled: true
+
+memory:
+  l1d:
+    size_kb: 32
+    line_size: 64
+    associativity: 8
+    latency_cycles: 2
+    bandwidth: 64
+  l1i:
+    size_kb: 32
+    line_size: 64
+    associativity: 4
+    latency_cycles: 2
+    bandwidth: 16
+  l2:
+    size_kb: 256
+    line_size: 64
+    associativity: 8
+    latency_cycles: 10
+    bandwidth: 32
+  l3:
+    size_kb: 4096
+    line_size: 64
+    associativity: 16
+    latency_cycles: 40
+    bandwidth: 16
+  dram:
+    type: "DDR4"
+    capacity_gb: 8
+    channels: 2
+    bus_width_bits: 64
+    frequency_mhz: 3200
+    latency_ns: 50.0
+
+interconnect:
+  bandwidth: 128
+  latency: 5

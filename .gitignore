@@ -1,0 +1,45 @@
+# Save as: C:\Users\ankit\transformer-perf-model\.gitignore
+# (starts with a dot)
+
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+.Python
+*.so
+*.egg
+*.egg-info/
+dist/
+build/
+.eggs/
+
+# Virtual environments
+venv/
+env/
+ENV/
+.venv/
+
+# Results and generated files
+results/
+test_results/
+*.png
+*.jpg
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+logs/
+
+# Local config
+*.env
+.env

@@ -1,0 +1,18 @@
+# Save as: C:\Users\ankit\transformer-perf-model\configs\models\bert_base.yaml
+
+name: "bert-base-uncased"
+model_type: "encoder"
+
+architecture:
+  hidden_dim: 768
+  num_heads: 12
+  num_layers: 12
+  intermediate_dim: 3072
+  vocab_size: 30522
+  max_seq_len: 512
+  activation: "gelu"
+
+inference:
+  batch_size: 1
+  seq_len: 128
+  dtype: "fp32"

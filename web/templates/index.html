@@ -1,0 +1,544 @@
+<!DOCTYPE html>
+<!-- Save as: C:\Users\ankit\transformer-perf-model\web\templates\index.html -->
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Transformer Performance Modeling — RISC-V SoC</title>
+  <link rel="stylesheet" href="/static/css/style.css" />
+</head>
+<body>
+
+<!-- ═══════════════════════════════════════════
+     HEADER
+═══════════════════════════════════════════ -->
+<header class="header">
+  <div class="header-inner">
+    <div class="header-logo">
+      <span class="logo-icon">⚡</span>
+      <div>
+        <h1>Transformer Performance Modeler</h1>
+        <p>RISC-V SoC End-to-End Inference Analysis</p>
+      </div>
+    </div>
+    <div class="header-badges">
+      <span class="badge badge-blue">Phase 1–4</span>
+      <span class="badge badge-green">RISC-V RVV</span>
+      <span class="badge badge-purple">AI Workloads</span>
+    </div>
+  </div>
+</header>
+
+<!-- ═══════════════════════════════════════════
+     MAIN LAYOUT
+═══════════════════════════════════════════ -->
+<main class="main-layout">
+
+  <!-- ───── LEFT PANEL: Configuration ───── -->
+  <aside class="config-panel">
+
+    <!-- Model Selection -->
+    <section class="card">
+      <div class="card-header">
+        <span class="card-icon">🤖</span>
+        <h2>Model Selection</h2>
+      </div>
+      <div class="model-grid" id="model-grid">
+        <!-- Populated by JS -->
+      </div>
+    </section>
+
+    <!-- Hardware Selection -->
+    <section class="card">
+      <div class="card-header">
+        <span class="card-icon">🖥️</span>
+        <h2>Hardware (RISC-V SoC)</h2>
+      </div>
+      <div class="hw-grid" id="hw-grid">
+        <!-- Populated by JS -->
+      </div>
+    </section>
+
+    <!-- Inference Settings -->
+    <section class="card">
+      <div class="card-header">
+        <span class="card-icon">⚙️</span>
+        <h2>Inference Settings</h2>
+      </div>
+      <div class="settings-grid">
+
+        <div class="setting-item">
+          <label for="batch-size">Batch Size</label>
+          <div class="input-with-val">
+            <input type="range" id="batch-size" min="1" max="16"
+                   step="1" value="1"
+                   oninput="document.getElementById('batch-val').textContent=this.value" />
+            <span class="range-val" id="batch-val">1</span>
+          </div>
+        </div>
+
+        <div class="setting-item">
+          <label for="seq-len">Sequence Length</label>
+          <div class="input-with-val">
+            <input type="range" id="seq-len" min="32" max="512"
+                   step="32" value="128"
+                   oninput="document.getElementById('seq-val').textContent=this.value" />
+            <span class="range-val" id="seq-val">128</span>
+          </div>
+        </div>
+
+        <div class="setting-item">
+          <label for="num-cores">Number of Cores</label>
+          <div class="input-with-val">
+            <input type="range" id="num-cores" min="1" max="8"
+                   step="1" value="1"
+                   oninput="document.getElementById('core-val').textContent=this.value" />
+            <span class="range-val" id="core-val">1</span>
+          </div>
+        </div>
+
+        <div class="setting-item">
+          <label for="dtype">Data Type</label>
+          <select id="dtype" class="select-input">
+            <option value="fp32">FP32 (Full Precision)</option>
+            <option value="fp16">FP16 (Half Precision)</option>
+            <option value="int8">INT8 (Quantized)</option>
+          </select>
+        </div>
+      </div>
+    </section>
+
+    <!-- Analysis Options -->
+    <section class="card">
+      <div class="card-header">
+        <span class="card-icon">🔬</span>
+        <h2>Analysis Options</h2>
+      </div>
+      <div class="checkbox-list">
+        <label class="checkbox-item">
+          <input type="checkbox" id="opt-sweep" checked />
+          <span>Throughput Sweep</span>
+        </label>
+        <label class="checkbox-item">
+          <input type="checkbox" id="opt-quant" checked />
+          <span>Quantization Analysis</span>
+        </label>
+        <label class="checkbox-item">
+          <input type="checkbox" id="opt-prune" checked />
+          <span>Pruning Analysis</span>
+        </label>
+        <label class="checkbox-item">
+          <input type="checkbox" id="opt-fusion" checked />
+          <span>Operator Fusion</span>
+        </label>
+      </div>
+
+      <div class="quant-targets">
+        <p class="sub-label">Quantization Targets:</p>
+        <label class="checkbox-item">
+          <input type="checkbox" id="qt-fp16" checked />
+          <span>FP16</span>
+        </label>
+        <label class="checkbox-item">
+          <input type="checkbox" id="qt-int8" checked />
+          <span>INT8</span>
+        </label>
+        <label class="checkbox-item">
+          <input type="checkbox" id="qt-int4" />
+          <span>INT4</span>
+        </label>
+      </div>
+    </section>
+
+    <!-- Run Button -->
+    <button class="run-btn" id="run-btn" onclick="runAnalysis()">
+      <span class="run-icon">▶</span>
+      Generate Results
+    </button>
+
+  </aside>
+
+  <!-- ───── RIGHT PANEL: Results ───── -->
+  <section class="results-panel" id="results-panel">
+
+    <!-- Placeholder when no results -->
+    <div class="placeholder" id="placeholder">
+      <div class="placeholder-icon">📊</div>
+      <h2>Configure & Run Analysis</h2>
+      <p>Select a model and hardware configuration on the left,<br>
+         then click <strong>Generate Results</strong> to begin.</p>
+      <div class="feature-list">
+        <span>⚡ Latency Estimation</span>
+        <span>🔋 Power Modeling</span>
+        <span>📈 Roofline Analysis</span>
+        <span>🗜️ Quantization</span>
+        <span>✂️ Pruning</span>
+        <span>🔗 Operator Fusion</span>
+      </div>
+    </div>
+
+    <!-- Loading overlay -->
+    <div class="loading" id="loading" style="display:none">
+      <div class="spinner"></div>
+      <h3>Running Analysis...</h3>
+      <div class="progress-steps" id="progress-steps">
+        <div class="step active" id="step-parse">📦 Parsing model</div>
+        <div class="step" id="step-hw">🖥️  Modeling hardware</div>
+        <div class="step" id="step-lat">⏱️  Estimating latency</div>
+        <div class="step" id="step-pow">🔋 Computing power</div>
+        <div class="step" id="step-opt">🔬 Running optimizations</div>
+        <div class="step" id="step-viz">🎨 Generating visualizations</div>
+      </div>
+    </div>
+
+    <!-- Results content (hidden until analysis done) -->
+    <div id="results-content" style="display:none">
+
+      <!-- ── Top Summary Cards ── -->
+      <div class="summary-bar">
+        <div class="sum-card">
+          <div class="sum-label">Model</div>
+          <div class="sum-value" id="sum-model">—</div>
+        </div>
+        <div class="sum-card">
+          <div class="sum-label">Hardware</div>
+          <div class="sum-value" id="sum-hw">—</div>
+        </div>
+        <div class="sum-card highlight-blue">
+          <div class="sum-label">Total Latency</div>
+          <div class="sum-value" id="sum-latency">—</div>
+          <div class="sum-unit">ms</div>
+        </div>
+        <div class="sum-card highlight-green">
+          <div class="sum-label">Throughput</div>
+          <div class="sum-value" id="sum-throughput">—</div>
+          <div class="sum-unit">tokens/s</div>
+        </div>
+        <div class="sum-card highlight-orange">
+          <div class="sum-label">Avg Power</div>
+          <div class="sum-value" id="sum-power">—</div>
+          <div class="sum-unit">W</div>
+        </div>
+        <div class="sum-card highlight-purple">
+          <div class="sum-label">HW Utilization</div>
+          <div class="sum-value" id="sum-util">—</div>
+          <div class="sum-unit">%</div>
+        </div>
+      </div>
+
+      <!-- ── Tabs ── -->
+      <div class="tabs">
+        <button class="tab active" onclick="showTab('tab-overview')">Overview</button>
+        <button class="tab" onclick="showTab('tab-latency')">Latency</button>
+        <button class="tab" onclick="showTab('tab-energy')">Energy</button>
+        <button class="tab" onclick="showTab('tab-roofline')">Roofline</button>
+        <button class="tab" onclick="showTab('tab-optim')">Optimizations</button>
+        <button class="tab" onclick="showTab('tab-charts')">Charts</button>
+        <button class="tab" onclick="showTab('tab-report')">Report</button>
+      </div>
+
+      <!-- ══ TAB: OVERVIEW ══ -->
+      <div class="tab-content active" id="tab-overview">
+        <div class="two-col">
+
+          <!-- Model Info -->
+          <div class="info-card">
+            <h3>🤖 Model Information</h3>
+            <table class="info-table" id="model-info-table"></table>
+          </div>
+
+          <!-- Hardware Info -->
+          <div class="info-card">
+            <h3>🖥️ Hardware Information</h3>
+            <table class="info-table" id="hw-info-table"></table>
+          </div>
+
+          <!-- Key Metrics -->
+          <div class="info-card">
+            <h3>📊 Key Performance Metrics</h3>
+            <table class="info-table" id="perf-table"></table>
+          </div>
+
+          <!-- SoC Comparison -->
+          <div class="info-card">
+            <h3>🔀 SoC Comparison</h3>
+            <table class="data-table" id="soc-table">
+              <thead>
+                <tr>
+                  <th>SoC</th>
+                  <th>Latency (ms)</th>
+                  <th>GFLOP/s</th>
+                  <th>Power (W)</th>
+                  <th>GFLOP/W</th>
+                </tr>
+              </thead>
+              <tbody id="soc-tbody"></tbody>
+            </table>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- ══ TAB: LATENCY ══ -->
+      <div class="tab-content" id="tab-latency">
+        <div class="metric-grid">
+          <div class="metric-card blue">
+            <div class="metric-icon">⏱️</div>
+            <div class="metric-label">Total Latency</div>
+            <div class="metric-value" id="lat-total">—</div>
+            <div class="metric-unit">ms</div>
+          </div>
+          <div class="metric-card green">
+            <div class="metric-icon">🚀</div>
+            <div class="metric-label">Throughput</div>
+            <div class="metric-value" id="lat-tps">—</div>
+            <div class="metric-unit">tokens/s</div>
+          </div>
+          <div class="metric-card purple">
+            <div class="metric-icon">⚡</div>
+            <div class="metric-label">Achieved GFLOP/s</div>
+            <div class="metric-value" id="lat-gflops">—</div>
+            <div class="metric-unit">GFLOP/s</div>
+          </div>
+          <div class="metric-card orange">
+            <div class="metric-icon">🎯</div>
+            <div class="metric-label">HW Utilization</div>
+            <div class="metric-value" id="lat-util">—</div>
+            <div class="metric-unit">%</div>
+          </div>
+        </div>
+
+        <!-- Utilization progress bar -->
+        <div class="progress-bar-container">
+          <label>Hardware Utilization</label>
+          <div class="progress-bar">
+            <div class="progress-fill" id="util-bar" style="width:0%"></div>
+          </div>
+          <span id="util-bar-label">0%</span>
+        </div>
+
+        <!-- Layer breakdown table -->
+        <div class="table-container">
+          <h3>Layer Breakdown (Top 20 by Cycles)</h3>
+          <table class="data-table" id="layer-table">
+            <thead>
+              <tr>
+                <th>#</th>
+                <th>Layer Name</th>
+                <th>Type</th>
+                <th>Cycles</th>
+                <th>Latency (ms)</th>
+                <th>FLOPs</th>
+                <th>Bound</th>
+                <th>GFLOP/s</th>
+              </tr>
+            </thead>
+            <tbody id="layer-tbody"></tbody>
+          </table>
+        </div>
+
+        <!-- Throughput sweep table -->
+        <div class="table-container" id="sweep-section">
+          <h3>Throughput Sweep (Batch Size)</h3>
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Batch</th>
+                <th>Latency (ms)</th>
+                <th>Tokens/s</th>
+                <th>Samples/s</th>
+                <th>GFLOP/s</th>
+                <th>HW Util %</th>
+                <th>Memory (MB)</th>
+              </tr>
+            </thead>
+            <tbody id="sweep-tbody"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- ══ TAB: ENERGY ══ -->
+      <div class="tab-content" id="tab-energy">
+        <div class="metric-grid">
+          <div class="metric-card red">
+            <div class="metric-icon">🔋</div>
+            <div class="metric-label">Total Energy</div>
+            <div class="metric-value" id="eng-total">—</div>
+            <div class="metric-unit">mJ</div>
+          </div>
+          <div class="metric-card orange">
+            <div class="metric-icon">⚡</div>
+            <div class="metric-label">Avg Power</div>
+            <div class="metric-value" id="eng-power">—</div>
+            <div class="metric-unit">W</div>
+          </div>
+          <div class="metric-card green">
+            <div class="metric-icon">🌿</div>
+            <div class="metric-label">Efficiency</div>
+            <div class="metric-value" id="eng-eff">—</div>
+            <div class="metric-unit">GFLOP/s/W</div>
+          </div>
+          <div class="metric-card blue">
+            <div class="metric-icon">🎫</div>
+            <div class="metric-label">Energy/Token</div>
+            <div class="metric-value" id="eng-token">—</div>
+            <div class="metric-unit">µJ</div>
+          </div>
+        </div>
+
+        <!-- Power breakdown table -->
+        <div class="info-card">
+          <h3>Power Breakdown</h3>
+          <table class="data-table" id="power-table">
+            <thead>
+              <tr>
+                <th>Component</th>
+                <th>Power (W)</th>
+                <th>Power (mW)</th>
+                <th>Share</th>
+              </tr>
+            </thead>
+            <tbody id="power-tbody"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- ══ TAB: ROOFLINE ══ -->
+      <div class="tab-content" id="tab-roofline">
+        <div class="metric-grid">
+          <div class="metric-card blue">
+            <div class="metric-icon">🏔️</div>
+            <div class="metric-label">Peak Compute</div>
+            <div class="metric-value" id="roof-peak">—</div>
+            <div class="metric-unit">GFLOP/s</div>
+          </div>
+          <div class="metric-card purple">
+            <div class="metric-icon">💾</div>
+            <div class="metric-label">Peak BW</div>
+            <div class="metric-value" id="roof-bw">—</div>
+            <div class="metric-unit">GB/s</div>
+          </div>
+          <div class="metric-card orange">
+            <div class="metric-icon">📍</div>
+            <div class="metric-label">Ridge Point</div>
+            <div class="metric-value" id="roof-ridge">—</div>
+            <div class="metric-unit">FLOP/byte</div>
+          </div>
+          <div class="metric-card green">
+            <div class="metric-icon">🔢</div>
+            <div class="metric-label">Compute Bound</div>
+            <div class="metric-value" id="roof-comp">—</div>
+            <div class="metric-unit">ops</div>
+          </div>
+          <div class="metric-card red">
+            <div class="metric-icon">🗃️</div>
+            <div class="metric-label">Memory Bound</div>
+            <div class="metric-value" id="roof-mem">—</div>
+            <div class="metric-unit">ops</div>
+          </div>
+        </div>
+
+        <!-- Roofline validation results -->
+        <div class="info-card">
+          <h3>Validation Results</h3>
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Metric</th>
+                <th>Estimated</th>
+                <th>Reference</th>
+                <th>Error %</th>
+                <th>Status</th>
+                <th>Confidence</th>
+              </tr>
+            </thead>
+            <tbody id="val-tbody"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- ══ TAB: OPTIMIZATIONS ══ -->
+      <div class="tab-content" id="tab-optim">
+
+        <!-- Quantization -->
+        <div class="info-card" id="quant-section">
+          <h3>🗜️ Quantization Analysis</h3>
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Target</th>
+                <th>Compression</th>
+                <th>Mem Savings</th>
+                <th>Speedup</th>
+                <th>Acc Drop</th>
+                <th>Original (MB)</th>
+                <th>Quantized (MB)</th>
+              </tr>
+            </thead>
+            <tbody id="quant-tbody"></tbody>
+          </table>
+        </div>
+
+        <!-- Pruning -->
+        <div class="info-card" id="prune-section">
+          <h3>✂️ Pruning Analysis (Structured)</h3>
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Sparsity</th>
+                <th>Speedup</th>
+                <th>Mem Savings</th>
+                <th>FLOP Reduction</th>
+                <th>Acc Drop</th>
+              </tr>
+            </thead>
+            <tbody id="prune-tbody"></tbody>
+          </table>
+        </div>
+
+        <!-- Fusion -->
+        <div class="info-card" id="fusion-section">
+          <h3>🔗 Operator Fusion</h3>
+          <div class="metric-grid" id="fusion-metrics">
+          </div>
+          <table class="data-table" style="margin-top:1rem">
+            <thead>
+              <tr>
+                <th>Fusion Name</th>
+                <th>Type</th>
+                <th>Speedup</th>
+              </tr>
+            </thead>
+            <tbody id="fusion-tbody"></tbody>
+          </table>
+        </div>
+
+      </div>
+
+      <!-- ══ TAB: CHARTS ══ -->
+      <div class="tab-content" id="tab-charts">
+        <div class="charts-grid" id="charts-grid">
+          <!-- Populated by JS -->
+        </div>
+      </div>
+
+      <!-- ══ TAB: REPORT ══ -->
+      <div class="tab-content" id="tab-report">
+        <div class="report-actions">
+          <button class="action-btn" onclick="downloadReport()">
+            ⬇ Download Report
+          </button>
+          <button class="action-btn" onclick="copyReport()">
+            📋 Copy to Clipboard
+          </button>
+        </div>
+        <pre class="report-text" id="report-text"></pre>
+      </div>
+
+    </div><!-- /results-content -->
+  </section><!-- /results-panel -->
+</main>
+
+<script src="/static/js/main.js"></script>
+</body>
+</html>
