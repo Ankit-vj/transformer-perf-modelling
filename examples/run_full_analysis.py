@@ -45,7 +45,7 @@ def main():
     # ============================================================
     model_preset = "gpt2-small"
     batch_size = 1
-    seq_len = 1
+    seq_len = 128
     dtype = "fp32"
     soc_preset = "mid-range"
 
@@ -102,7 +102,7 @@ def main():
     batch_results = tp_estimator.sweep_batch_sizes(
         parser, model_preset,
         batch_sizes=[1, 2, 4, 8, 16],
-        seq_len=seq_len, dtype=dtype, num_cores=4
+        seq_len=seq_len, dtype=dtype
 
     )
     ThroughputEstimator.print_sweep_results(batch_results, "batch_size")
