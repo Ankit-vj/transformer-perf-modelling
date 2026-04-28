@@ -187,6 +187,6 @@ if __name__ == "__main__":
     results = estimator.sweep_batch_sizes(
         parser, "bert-base",
         batch_sizes=[1, 2, 4, 8],
-        seq_len=128
+        seq_len=128, num_cores=1
     )
     ThroughputEstimator.print_sweep_results(results, "batch_size")
