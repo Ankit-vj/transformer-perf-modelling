@@ -240,7 +240,7 @@ def analyze():
             batch_sweep = tp_est.sweep_batch_sizes(
                 parser, model_preset,
                 batch_sizes=[1, 2, 4, 8],
-                seq_len=seq_len, dtype=dtype,
+                seq_len=seq_len, dtype=dtype,num_cores=num_cores,
             )
             for r in batch_sweep:
                 sweep_results.append({
