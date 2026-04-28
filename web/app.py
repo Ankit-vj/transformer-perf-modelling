@@ -212,9 +212,15 @@ def analyze():
         )
         graph_summary = graph.summary()
 
-        # Step 2: Build SoC
-        soc  = RISCVSoC(preset=soc_preset)
-        peak = soc.get_peak_performance(dtype)
+        # Step 2: Build SoC — apply user's num_cores override
+	soc = RISCVSoC(preset=soc_preset)
+	if num_cores != soc.num_cores:
+            from transformer_perf.hardware.core import RISCVCore
+    	    freq_ghz = soc.frequency / 1e9
+    	    core_cfg = {"name": f"rv64gcv-{soc_preset}", "frequency_ghz": freq_ghz}
+    	    soc.num_cores = num_cores
+    	    soc.cores = [RISCVCore(config=core_cfg) for _ in range(num_cores)]
+	peak = soc.get_peak_performance(dtype)
 
         # Step 3: Latency
         lat_est    = LatencyEstimator(soc)
