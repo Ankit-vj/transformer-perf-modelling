@@ -320,7 +320,7 @@ def analyze():
         for preset in ["minimal", "mid-range", "high-perf"]:
             t_soc    = RISCVSoC(preset=preset)
             t_lat    = LatencyEstimator(t_soc)
-            t_result = t_lat.estimate_model(graph, dtype=dtype, seq_len=seq_len, num_cores=num_cores)
+            t_result = t_lat.estimate_model(graph, dtype=dtype, seq_len=seq_len)
             t_power  = PowerEstimator(t_soc)
             t_energy = t_power.estimate_energy(t_result, seq_len)
             soc_comparison.append({
