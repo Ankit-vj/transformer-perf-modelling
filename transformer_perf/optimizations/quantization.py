@@ -347,16 +347,16 @@ class QuantizationAnalyzer:
 
             # Per-layer roofline speedup
             total_latency_for_weight = sum(
-                lr.layer_latency_ms
-                for lr in lat_result.layer_results
-                if hasattr(lr, "layer_latency_ms")
+                lr.latency_ms
+                for lr in lat_result.layer_breakdown
+                if hasattr(lr, "latency_ms")
             ) or original_latency
 
             layer_lookup = {}
-            if hasattr(lat_result, "layer_results"):
-                for lr in lat_result.layer_results:
-                    if hasattr(lr, "layer_name") and hasattr(lr, "layer_latency_ms"):
-                        layer_lookup[lr.layer_name] = lr.layer_latency_ms
+            if hasattr(lat_result, "layer_breakdown"):
+                for lr in lat_result.layer_breakdown:
+                    if hasattr(lr, "layer_name") and hasattr(lr, "latency_ms"):
+                        layer_lookup[lr.layer_name] = lr.latency_ms
 
             # Walk graph and compute per-layer speedup
             quantized_latency = 0.0
